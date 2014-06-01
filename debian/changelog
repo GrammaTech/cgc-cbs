@@ -1,0 +1,11 @@
+cgc-service-launcher (1235-cqe-kickoff-release) UNRELEASED; urgency=low
+
+  * build
+
+ -- Brian Caswell <bmc@lungetech.com>  Wed, 28 May 2014 12:53:42 +0000
+
+cgc-service-launcher (0.1) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Brian Caswell <bmc@lungetech.com>  Wed, 05 Mar 2014 17:43:19 +0000
