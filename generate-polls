@@ -1,0 +1,148 @@
+#!/usr/bin/python -B
+#
+# generate-polls 
+# 
+# Copyright (C) 2014 Brian Caswell <bmc@lungetech.com>
+#
+# Permission is hereby granted, free of charge, to any person obtaining a
+# copy of this software and associated documentation files (the "Software"),
+# to deal in the Software without restriction, including without limitation
+# the rights to use, copy, modify, merge, publish, distribute, sublicense,
+# and/or sell copies of the Software, and to permit persons to whom the
+# Software is furnished to do so, subject to the following conditions:
+#  
+# The above copyright notice and this permission notice shall be included
+# in all copies or substantial portions of the Software.
+#  
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+# OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+# CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+
+import argparse
+import imp
+import os
+import random
+import sys
+import yaml
+
+sys.path.append('lib')
+
+from generator.actions import Actions
+from generator.graph import Graph
+
+
+def get_attribute(item, name, default=None):
+    if name in item:
+        return item[name]
+    if default is None:
+        raise Exception('No value for %s')
+    return default
+
+
+def verify_node(node):
+    assert isinstance(node, dict)
+    assert 'name' in node
+    assert set(node.keys()).issubset(set(['name', 'chance', 'continue']))
+
+
+def get_graph(machine, filename):
+    with open(filename, 'r') as graph_fh:
+        states = yaml.load(graph_fh)
+
+    assert len(states) == 2
+    assert 'nodes' in states
+    assert 'edges' in states
+
+    graph = Graph()
+    for node in states['nodes']:
+        verify_node(node)
+
+        assert hasattr(machine, node['name'])
+
+        chance = get_attribute(node, 'chance', 1.0)
+        continue_chance = get_attribute(node, 'continue', 1.0)
+
+        node_ptr = getattr(machine, node['name'])
+        graph.add_node(node_ptr, chance=chance,
+                       continue_chance=continue_chance)
+
+    for edge in states['edges']:
+        assert len(edge) <= 2
+        weight = get_attribute(edge, 'weight', 1)
+        for node in edge.keys():
+            if node == 'weight':
+                continue
+            assert hasattr(machine, node)
+            assert hasattr(machine, edge[node])
+            graph.add_edge(getattr(machine, node), getattr(machine,
+                                                           edge[node]),
+                           weight=weight)
+
+    if hasattr(machine, 'start'):
+        graph.start = machine.start
+
+    return graph
+
+
+def get_state_machine(filename):
+    module = imp.load_source('state_machine', filename)
+    x = None
+    for name in dir(module):
+        obj = getattr(module, name)
+        if name == 'Actions':
+            continue
+        if not issubclass(obj, Actions):
+            continue
+        return obj()
+    raise Exception('No state machine defined in %s' % filename)
+
+
+def main():
+    parser = argparse.ArgumentParser(description='Generate CGC Polls')
+    parser.add_argument('--count', required=False, type=int, default=100,
+                        help='How many iterations to generate')
+    parser.add_argument('--depth', required=False, type=int, default=0xFFFFF,
+                        help='Maximum number of state transitions per iteration')
+    parser.add_argument('--seed', required=False, type=str,
+                        help='Set random seed')
+    parser.add_argument('machine', metavar='machine', type=str,
+                        help='Python module with Actions state machine')
+    parser.add_argument('state', metavar='state_graph', type=str,
+                        help='YAML file specifying state transitions')
+    parser.add_argument('output', metavar='output', type=str,
+                        help='Output directory')
+    args = parser.parse_args()
+
+    machine = get_state_machine(args.machine)
+    graph = get_graph(machine, args.state)
+
+    graph.max_depth = args.depth
+
+    if args.seed:
+        random.seed(args.seed)
+
+    if len(args.output):
+        if not os.path.exists(args.output):
+            os.makedirs(args.output)
+        elif not os.path.isdir(args.output):
+            raise Exception('output directory is not a directory: %s' %
+                            args.output)
+
+    with open(os.path.join(args.output, 'graph.dot'), 'w') as fh:
+        fh.write(graph.dot())
+
+    for i in range(0, args.count):
+        graph.walk()
+        with open(os.path.join(args.output, 'gen_%06d.xml' % i), 'w') as fh:
+            fh.write(machine.xml())
+        machine.reset()
+
+    graph.plot(args.output)
+
+if __name__ == '__main__':
+    main()
