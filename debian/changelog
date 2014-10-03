@@ -1,0 +1,11 @@
+cgc2elf (2240-scored-event-1) UNRELEASED; urgency=low
+
+  * build
+
+ -- Brian Caswell <bmc@lungetech.com>  Thu, 25 Sep 2014 09:49:03 +0000
+
+cgc2elf (0.1) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Brian Caswell <bmc@lungetech.com>  Wed, 05 Mar 2014 17:43:19 +0000
