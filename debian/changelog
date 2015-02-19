@@ -1,0 +1,11 @@
+cgc2elf (3739-cqe) UNRELEASED; urgency=low
+
+  * build
+
+ -- Brian Caswell <bmc@lungetech.com>  Wed, 11 Feb 2015 07:07:26 +0000
+
+cgc2elf (0.1) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Brian Caswell <bmc@lungetech.com>  Wed, 05 Mar 2014 17:43:19 +0000
