@@ -1,0 +1,11 @@
+poll-generator (7170-cfe-alpha) UNRELEASED; urgency=low
+
+  * build
+
+ -- Brian Caswell <bmc@lungetech.com>  Thu, 16 Jul 2015 22:31:42 +0000
+
+poll-generator (1.0) unstable; urgency=low
+
+  * Initial Release.
+
+ -- bmc <bmc@lungetech.com>  Mon, 23 Jun 2014 16:45:08 -0400
