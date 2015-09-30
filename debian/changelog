@@ -1,0 +1,11 @@
+cgc-service-launcher (7667-cfe-rc2) UNRELEASED; urgency=low
+
+  * build
+
+ -- Brian Caswell <bmc@lungetech.com>  Tue, 29 Sep 2015 14:57:18 +0000
+
+cgc-service-launcher (0.1) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Brian Caswell <bmc@lungetech.com>  Wed, 05 Mar 2014 17:43:19 +0000
