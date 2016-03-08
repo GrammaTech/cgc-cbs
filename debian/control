@@ -1,0 +1,15 @@
+Source: cgc-service-launcher
+Section: net
+Priority: standard
+Maintainer: Brian Caswell <bmc@lungetech.com>
+Build-Depends: debhelper (>= 8.0.0), pandoc
+Standards-Version: 3.9.3
+Homepage: http://www.darpa.mil/cybergrandchallenge
+
+Package: cgc-service-launcher
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: CGC Service Launcher
+ cb-launch is an 'inetd' like application launcher, focused on segmenting CB
+ interaction required for DARPA's Cyber Grand Challenge.  CBs are launched via
+ randomly unused UIDs and GIDs.  
