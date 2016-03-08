@@ -1,0 +1,11 @@
+cgc2elf (9082-cfe-rc4) UNRELEASED; urgency=low
+
+  * build
+
+ -- Brian Caswell <bmc@lungetech.com>  Mon, 29 Feb 2016 16:06:09 +0000
+
+cgc2elf (0.1) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Brian Caswell <bmc@lungetech.com>  Wed, 05 Mar 2014 17:43:19 +0000

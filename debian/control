@@ -1,0 +1,14 @@
+Source: cgc2elf
+Section: net
+Priority: standard
+Maintainer: Brian Caswell <bmc@lungetech.com>
+Build-Depends: debhelper (>= 8.0.0)
+Standards-Version: 3.9.3
+Homepage: http://www.darpa.mil/cybergrandchallenge
+
+Package: cgc2elf
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Convert ELF binaries to CGCOS binaries
+ cgc2elf is a tool used for converting DECREE binaries into an ELF binary which
+ enables analysis using existing toolchains.
