@@ -1,0 +1,17 @@
+Source: poll-generator
+Section: devel
+Priority: extra
+Maintainer: bmc <bmc@lungetech.com>
+Build-Depends: debhelper (>= 8.0.0)
+Standards-Version: 3.9.3
+Homepage: http://www.darpa.mil/cybergrandchallenge/
+
+Package: poll-generator
+Architecture: all
+Depends: ${python:Depends}, ${misc:Depends}, python-yaml, python-matplotlib
+Description: Cyber Grand Challenge Poll Generator
+ Directed Graph based Poll generator, for use in dynamically building polling
+ iterations for use when building Challenge binaries for use in DARPA's Cyber
+ Grand Challenge.
+ .
+ Includes examples and documentation of how to use the generator.

@@ -1,0 +1,11 @@
+poll-generator (10206-cfe-rc6) UNRELEASED; urgency=low
+
+  * build
+
+ -- Brian Caswell <bmc@lungetech.com>  Tue, 12 Jul 2016 14:38:43 +0000
+
+poll-generator (1.0) unstable; urgency=low
+
+  * Initial Release.
+
+ -- bmc <bmc@lungetech.com>  Mon, 23 Jun 2014 16:45:08 -0400
