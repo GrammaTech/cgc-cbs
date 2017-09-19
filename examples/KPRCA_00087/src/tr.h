@@ -24,6 +24,7 @@
 #ifndef TR_H
 #define TR_H
 #include <stdio.h>
+#include "_defines.h"
 
 typedef void* T;
 typedef struct tr_node {

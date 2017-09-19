@@ -24,6 +24,7 @@
 #ifndef PRINT_H_
 #define PRINT_H_
 #include <cstdio.h>
+#include "_defines.h"
 
 #define PRINT_ARR_CHARS(_array, _size) \
     do { \

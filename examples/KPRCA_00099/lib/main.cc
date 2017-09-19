@@ -44,7 +44,7 @@ void ctors()
     for (i = 0; i < __init_array_end - __init_array_start; i++)
     {
         void (*fn) (int, char **, char **) = __init_array_start[i];
-        if (fn != NULL && (unsigned int)fn != 1)
+        if (fn != NULL && (size_t)fn != 1)
             fn(0, NULL, NULL);
     }
 }

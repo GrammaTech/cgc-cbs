@@ -30,7 +30,7 @@
 #include <mutex.h>
 
 #define NUM_FREE_LISTS 32
-#define HEADER_PADDING 24
+#define HEADER_PADDING sizeof(struct blk_t)
 #define NEW_CHUNK_SIZE 262144
 #define ALIGNMENT 32
 

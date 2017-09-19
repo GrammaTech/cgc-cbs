@@ -33,12 +33,12 @@ extern "C"
 #include <stdio.h>
 }
 
-void *operator new( uint32_t size )
+void *operator new( size_t size )
 {
 	return (void *)malloc( size );
 }	
 
-void *operator new[]( uint32_t size )
+void *operator new[]( size_t size )
 {
 	return (void *)malloc( size );
 }

@@ -67,7 +67,7 @@ size_t rxbytes;
 // note that buffer[limit] will have a null written so ensure the incoming buffer is limit+1 in size
 size_t receive_until( char *buffer, char delim, size_t limit )
 {
-    const int maxLen = 512;
+#define maxLen 512
     static char circ_buffer[maxLen];
     static int head = 0;
     static int end = 0;

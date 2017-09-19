@@ -23,7 +23,7 @@
 #include <cstdlib.h>
 #include <cstring.h>
 
-void *operator new(unsigned int length)
+void *operator new(size_t length)
 {
     void *ptr = malloc(length);
     if (ptr == NULL)
@@ -31,7 +31,7 @@ void *operator new(unsigned int length)
     return ptr;
 }
 
-void *operator new[](unsigned int length)
+void *operator new[](size_t length)
 {
     void *ptr = malloc(length);
     if (ptr == NULL)

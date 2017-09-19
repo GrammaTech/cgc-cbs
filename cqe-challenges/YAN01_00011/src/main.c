@@ -349,6 +349,8 @@ int main(void)
   size_t sret = 0;
   char c = '\n';
 
+  memset(buf, 0, BUF_SIZE);
+
   transmit_str(ENTER_NUM_MSG);
   READLINE(buf, BUF_SIZE);
   

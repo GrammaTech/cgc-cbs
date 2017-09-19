@@ -39,6 +39,7 @@
 })
 #define min(__x, __y) (__x) < (__y) ? (__x) : (__y)
 #define BUFFER_SZ 0x1000
+#define nullptr NULL
 typedef ssize_t off_t;
 typedef uint32_t buffer_id_t;
 typedef enum
@@ -241,7 +242,7 @@ class BufferCache
     void MarkUsed(Buffer* B)
     {
       Free_->RemoveByValue(B);
-      auto q = Queues_[B->id % NUM_QS];
+      auto ArrayList<Buffer>* q = Queues_[B->id % NUM_QS];
       q->Append(B);
     }
 
@@ -253,7 +254,7 @@ class BufferCache
     Buffer* Get(uint32_t id)
     {
       size_t idx = id % NUM_QS;
-      auto q = Queues_[idx];
+      auto ArrayList<Buffer>* q = Queues_[idx];
       for(size_t i = 0; i < q->Size(); ++i)
       {
         if (q->Get(i)->id == id)
@@ -465,12 +466,13 @@ class Pathname
 
     size_t size_;
     uint8_t* data_;
-    ArrayList<Pair<size_t>>* components_ = new ArrayList<Pair<size_t>>();
+    ArrayList<Pair<size_t> >* components_;
 
 
   public:
     Pathname(const char* pathname)
     {
+      components_ = new ArrayList<Pair<size_t> >();
       size_ = strlen((char *)pathname);
       size_t i;
       size_t start;
@@ -543,8 +545,8 @@ class File
     {
       for (size_t i = 0; i < buffers_.Size(); ++i)
       {
-        auto A = buffers_.Get(i);
-        auto B = BCache->Get(*A);
+        auto buffer_id_t * A = buffers_.Get(i);
+        auto Buffer * B = BCache->Get(*A);
         BCache->AddFree(B);
       }
     }
@@ -668,8 +670,8 @@ class File
 
       while (cnt < len)
       {
-        auto buf_idx = buffers_.Get(buf);
-        auto bufp = BCache->Get(*buf_idx);
+        auto buffer_id_t * buf_idx = buffers_.Get(buf);
+        auto Buffer * bufp = BCache->Get(*buf_idx);
 
         if (offset && buf == (offset / BUFFER_SZ))
         {
@@ -738,7 +740,7 @@ class Either
 class DirTree
 {
   public:
-    ArrayList<Either<DirTree, File>> children;
+    ArrayList<Either<DirTree, File> > children;
     const char* name;
 
     DirTree(const char* n)
@@ -750,7 +752,7 @@ class DirTree
     {
       for (size_t i = 0; i < children.Size(); i++)
       {
-        auto E = children.Get(i);
+        auto Either<DirTree, File> * E = children.Get(i);
         if (E->IsLeft())
         {
           if (strcmp(E->l->name, s) == 0)
@@ -830,7 +832,7 @@ class FileHandle
   }
 };
 
-auto Root = DirTree(nullptr);
+DirTree Root = DirTree(nullptr);
 
 #define MAX_FDS 1024
 FileHandle* UserFDs[MAX_FDS];
@@ -865,8 +867,8 @@ int api_open(const char* pathname, open_flags_t flags, uint32_t mode)
     flags = (open_flags_t)(flags | RDONLY);
   }
 
-  auto node = new Either<DirTree, File>(&Root, nullptr);
-  auto pn = new Pathname(pathname);
+  auto Either<DirTree, File> * node = new Either<DirTree, File>(&Root, nullptr);
+  auto Pathname * pn = new Pathname(pathname);
 
   for (size_t i = 0; i < pn->Size(); ++i)
   {
@@ -1019,23 +1021,23 @@ int api_creat(const char* pathname, int mode)
   }
 
   dbg("Called create(%s, %d)", pathname, mode);
-  auto pn = Pathname(pathname);
-  auto node = new Either<DirTree, File>(&Root);
+  auto Pathname pn = Pathname(pathname);
+  auto Either<DirTree, File> * node = new Either<DirTree, File>(&Root);
   File* f = nullptr;
 
   for (size_t i = 0; i < pn.Size() - 1; ++i)
   {
-    auto x = pn.Get(i);
+    auto const char * x = pn.Get(i);
     if (node->IsLeft())
     {
-      auto old = node;
+      auto Either<DirTree, File> * old = node;
       node = node->l->Search(x);
       if (!node)
       {
         node = old;
         if (mode & MAKE_PARENTS)
         {
-          auto new_node = new Either<DirTree, File>(new DirTree(x));
+          auto Either<DirTree, File> * new_node = new Either<DirTree, File>(new DirTree(x));
           node->l->children.Append(new_node);
           node = new_node;
         }
@@ -1058,8 +1060,8 @@ int api_creat(const char* pathname, int mode)
 
   for (size_t i = 0; i < node->l->children.Size(); ++i)
   {
-    auto name = pn.Get(pn.Size() -1);
-    auto c = node->l->children.Get(i);
+    auto const char * name = pn.Get(pn.Size() -1);
+    auto Either<DirTree, File> * c = node->l->children.Get(i);
     if (c->IsLeft())
     {
       if (strcmp(c->l->name, name) == 0)
@@ -1091,13 +1093,13 @@ int api_unlink(const char* pathname)
   int ret = -1;
 
   DirTree* dir;
-  auto pn = Pathname(pathname);
-  auto node = new Either<DirTree, File>(&Root);
+  auto Pathname pn = Pathname(pathname);
+  auto Either<DirTree, File> * node = new Either<DirTree, File>(&Root);
   File* f = nullptr;
 
   for (size_t i = 0; i < pn.Size(); ++i)
   {
-    auto x = pn.Get(i);
+    auto const char * x = pn.Get(i);
     if (node->IsLeft())
     {
       dir = node->l;
@@ -1122,7 +1124,7 @@ int api_unlink(const char* pathname)
     if (f->RefCnt() <= 1)
 #endif
     {
-      auto x = dir->children.RemoveByValue(node);
+      auto Either<DirTree, File> * x = dir->children.RemoveByValue(node);
       delete x;
       ret = 0;
     }

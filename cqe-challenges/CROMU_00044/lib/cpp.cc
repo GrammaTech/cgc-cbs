@@ -5,12 +5,12 @@ extern "C"
 #include <malloc.h>
 }
 
-void *operator new( unsigned int alloc_size )
+void *operator new( size_t alloc_size )
 {
     return (void *)malloc( alloc_size );
 }
 
-void *operator new[]( unsigned int alloc_size )
+void *operator new[]( size_t alloc_size )
 {
     return (void *)malloc( alloc_size );
 }

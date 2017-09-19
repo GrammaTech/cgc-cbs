@@ -28,14 +28,18 @@ AudioTrack::AudioTrack()
     mute = false;
 }
 
-AudioTrack::AudioTrack(AudioStream *left) : AudioTrack()
+AudioTrack::AudioTrack(AudioStream *left)
 {
+    pan = 0;
+    mute = false;
     stereo = false;
     channels[0] = left;
 }
 
-AudioTrack::AudioTrack(AudioStream *left, AudioStream *right) : AudioTrack()
+AudioTrack::AudioTrack(AudioStream *left, AudioStream *right)
 {
+    pan = 0;
+    mute = false;
     stereo = true;
     channels[0] = left;
     channels[1] = right;

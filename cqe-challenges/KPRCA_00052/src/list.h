@@ -1,7 +1,7 @@
 #ifndef LIST_H_
 #define LIST_H_
 
-#define MAX_LIST_SIZE 1024
+#define MAX_LIST_SIZE 1000
 
 extern "C"
 {

@@ -29,6 +29,7 @@
 #include "array.h"
 #include "cluster.h"
 #include "fs_file.h"
+#include "_defines.h"
 
 #define PRINT_ARR_CHARS(_array, _size) \
     do { \

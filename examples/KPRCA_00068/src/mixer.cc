@@ -34,7 +34,7 @@ Mixer::~Mixer()
 unsigned int Mixer::getLength() const
 {
     unsigned int length = 0;
-    for (auto it = tracks.begin(); !it.empty(); it.next())
+    for (auto LinkedList<AudioTrack *>::Iterator it = tracks.begin(); !it.empty(); it.next())
     {
         unsigned int trackLength = it.value()->getLength();
         if (trackLength > length)
@@ -51,7 +51,7 @@ void Mixer::addTrack(AudioTrack *track)
 
 AudioTrack *Mixer::getTrack(unsigned int id) const
 {
-    for (auto it = tracks.begin(); !it.empty(); it.next())
+    for (auto LinkedList<AudioTrack *>::Iterator it = tracks.begin(); !it.empty(); it.next())
     {
         AudioTrack *track = it.value();
         if (track->id == id)
@@ -63,7 +63,7 @@ AudioTrack *Mixer::getTrack(unsigned int id) const
 
 void Mixer::removeTrack(unsigned int id)
 {
-    for (auto it = tracks.begin(); !it.empty(); it.next())
+    for (auto LinkedList<AudioTrack *>::Iterator it = tracks.begin(); !it.empty(); it.next())
     {
         AudioTrack *track = it.value();
         if (track->id == id)
@@ -92,7 +92,7 @@ bool Mixer::combineTracks(unsigned int leftId, unsigned int rightId)
     left = getTrack(leftId);
     if (left == NULL || left->getStereo())
         return false;
-    for (auto it = tracks.begin(); !it.empty(); it.next())
+    for (auto LinkedList<AudioTrack *>::Iterator it = tracks.begin(); !it.empty(); it.next())
     {
         right = it.value();
         if (right->id == rightId)
@@ -112,7 +112,7 @@ AudioTrack *Mixer::exportMix()
 {
     unsigned int length = getLength();
     AudioTrack *output = new AudioTrack(AudioStream::fromSilence(length), AudioStream::fromSilence(length));
-    for (auto it = tracks.begin(); !it.empty(); it.next())
+    for (auto LinkedList<AudioTrack *>::Iterator it = tracks.begin(); !it.empty(); it.next())
     {
         AudioTrack *track = it.value();
         output->mix(*track);

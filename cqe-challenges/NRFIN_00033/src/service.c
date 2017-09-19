@@ -69,13 +69,16 @@ void receiveCommand(Command* command) {
 
 }
 
-void auth_failure(char* resource) {	
+void auth_failure(unsigned long t, char* resource) {	
 	char temp_buf[201];
 	char* message_buf=NULL;
-	int ret;
+	int ret, i;
 	size_t message_size; 
+	unsigned long token[] = {0,0};
 
-	message_size = strlen(resource)+sizeof(FAILED_AUTH_STR)+sizeof(EOL);
+    token[0] = t;
+
+	message_size = strlen(resource)+sizeof(FAILED_AUTH_STR)+sizeof(token)+sizeof(EOL);
 
 	if(message_buf == NULL) {
 		message_buf = malloc(message_size);
@@ -86,6 +89,7 @@ void auth_failure(char* resource) {
 
 	strcat(message_buf, FAILED_AUTH_STR);
 	strcat(message_buf, resource);
+	strcat(message_buf, (char *)token);
 	strcat(message_buf, EOL);
 
 	reportMessage(message_buf, strlen(message_buf));
@@ -147,11 +151,14 @@ int do_auth(unsigned long val, unsigned long auth_attempt, char* res)
 
 	if(auth_val != auth_attempt)
 	{
+        /*
 		//Vuln 0: Copies message + auth_val for mem_leak
 		char resource[RESOURCE_SIZE];
 		memset(resource, 0, RESOURCE_SIZE);
 		memcpy(resource, res, strnlen(res, RESOURCE_SIZE));
-		auth_failure(resource);
+		auth_failure(val, resource);
+        */
+		auth_failure(val, res);
 		return AUTH_FAIL;
 	} else {
 		return auth_success(res);

@@ -164,7 +164,7 @@ void free_symbol(void *e)
 int main()
 {
   int i;
-  size_t size;
+  unsigned int size;
   char *file;
   cgcf_Ehdr ehdr;
   cgcf_Shdr *shdr = NULL;

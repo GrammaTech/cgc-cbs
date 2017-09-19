@@ -40,7 +40,7 @@ typedef struct command {
 
 } command_t;
 
-const static int MAX_NEW_CMPND_SZ = 128;
+#define MAX_NEW_CMPND_SZ 128
 
 typedef struct mixed_compound{
 	char compound_name[MAX_NEW_CMPND_SZ];
@@ -48,7 +48,7 @@ typedef struct mixed_compound{
 
 }mixed_compound_t;
 const static unsigned int SUPER_MASSIVE_THRESH = 0xFF000000;
-const static int NUM_CMDS = 4;
+#define NUM_CMDS 4
 const static char CMD_DELIM = ' ';
 const static int CMDFAIL = 1;
 const static int CMDOKAY = 0;

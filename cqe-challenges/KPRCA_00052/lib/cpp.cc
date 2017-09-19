@@ -10,12 +10,12 @@ extern "C" void __cxa_pure_virtual()
     printf("Virtual Function....\n");
 }
 
-void *operator new(unsigned int size)
+void *operator new( size_t size )
 {
     return malloc(size);
 }
 
-void *operator new[](unsigned int size)
+void *operator new[]( size_t size )
 {
     return ::operator new(size);
 }

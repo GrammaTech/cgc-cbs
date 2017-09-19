@@ -35,7 +35,7 @@ THE SOFTWARE.
 
 int main(void) {
 
-playerInfoType players[MAX_PLAYERS];	
+playerInfoType players[MAX_PLAYERS] = { 0 };
 char buffer[4];
 int silentMenu;
 int selection;

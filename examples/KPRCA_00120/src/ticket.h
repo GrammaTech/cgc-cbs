@@ -2,6 +2,7 @@
 #define MAX_EMAIL 64
 #define MAX_DESC 512
 #include <cstdint.h>
+#include "_defines.h"
 
 typedef enum {
   OPEN = 1,

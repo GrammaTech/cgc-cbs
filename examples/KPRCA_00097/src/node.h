@@ -25,6 +25,8 @@
 #include "attribute.h"
 #include "string.h"
 
+#define nullptr NULL
+
 extern const String *CML_TAG;
 extern const String *EMPTY_TAG;
 

@@ -330,7 +330,7 @@ bool Interface::menuNew()
 
 void Interface::listTracks()
 {
-    for (auto it = mixer.getTracks(); !it.empty(); it.next())
+    for (auto LinkedList<AudioTrack *>::Iterator it = mixer.getTracks(); !it.empty(); it.next())
     {
         AudioTrack *track = it.value();
         fprintf(stdout, "%d) %s samples=%d\n", track->id, track->getStereo() ? "stereo" : "mono", track->getLength());

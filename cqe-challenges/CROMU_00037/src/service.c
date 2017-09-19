@@ -55,7 +55,7 @@ void PrintLoggedInMenu(void) {
 
 }
 
-void BusyWork(void) {
+/*void BusyWork(void) {
 	char array[4096];
 	int addr = (int)(&PrintLoggedOutMenu) & 0xfffff000;
 	int i = 20;
@@ -65,7 +65,7 @@ void BusyWork(void) {
 		sort_n_sum(array, 4096);
 	}
 
-}
+}*/
 
 int main(void) {
 	users_t users[MAX_USERS];

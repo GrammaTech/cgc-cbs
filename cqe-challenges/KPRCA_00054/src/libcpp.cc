@@ -30,11 +30,11 @@ extern "C" {
   void __cxa_pure_virtual() { exit(0); }
 };
 
-void *operator new(unsigned int sz) {
+void *operator new( size_t sz ) {
   return malloc(sz);
 }
 
-void *operator new[](unsigned int sz) {
+void *operator new[]( size_t sz ) {
   return ::operator new(sz);
 }
 

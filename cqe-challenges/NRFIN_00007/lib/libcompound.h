@@ -25,7 +25,7 @@
 #ifndef MIX_CHEM
 #define MIX_CHEM
 
-const static int N_FORMULAS = 3000;
+#define N_FORMULAS 3000
 typedef struct chem_formula {
 	char *compound_name;
 	double mole;

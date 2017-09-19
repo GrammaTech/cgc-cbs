@@ -33,7 +33,7 @@
 #include "data_gen.h"
 
 
-static const int LINE_SIZE = 1024;
+#define LINE_SIZE 1024
 static char line[LINE_SIZE];
 
 int yes_no_input()

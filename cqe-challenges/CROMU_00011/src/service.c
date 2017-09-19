@@ -179,9 +179,9 @@ char * print_subsets( psetArray r, int addName, int depth )
 char * print_subsets( psetArray r, int addName )
 #endif
 {
-	char *outbuff = NULL;
-	char *t = NULL;
 	char data[DATAMAX];
+	char *outbuff = NULL;
+	char *t[2] = {NULL};
 	int index = 0;
 	int ei = 0;
 #ifdef PATCHED
@@ -210,14 +210,14 @@ char * print_subsets( psetArray r, int addName )
 #endif
 				data[index++] = '"';
 
-			t = r->sElems[ei]->value;
+			t[0] = r->sElems[ei]->value;
 
 #ifdef PATCHED
-			if ( index + strlen(t) >= DATAMAX-1 ) {
+			if ( index + strlen(t[0]) >= DATAMAX-1 ) {
 				goto end;
 			}
 #endif
-			index = copymem( data, t, index, strlen(t));
+			index = copymem( data, t[0], index, strlen(t[0]));
 
 #ifdef PATCHED
 			if ( index < DATAMAX-1 )
@@ -226,25 +226,25 @@ char * print_subsets( psetArray r, int addName )
 		} else {
 			psetArray tp = retrieve_set( r->sElems[ei]->value);
 #ifdef PATCHED
-            t = print_subsets( tp, 0, depth + 1);
+            t[0] = print_subsets( tp, 0, depth + 1);
 #else
-			t = print_subsets( tp, 0 );
+			t[0] = print_subsets( tp, 0 );
 #endif
 
-			if ( t == NULL ) {
+			if ( t[0] == NULL ) {
 				outbuff = NULL;
 				goto end;
 			}
 
 #ifdef PATCHED
-			if ( index + strlen(t) >= DATAMAX-1 ) {
-				deallocate(t, strlen(t) + 1 );
+			if ( index + strlen(t[0]) >= DATAMAX-1 ) {
+				deallocate(t[0], strlen(t[0]) + 1 );
 				goto end;
 			}
 #endif
 
-			index = copymem( data, t, index, strlen(t));
-			deallocate(t, strlen(t) + 1 );	
+			index = copymem( data, t[0], index, strlen(t[0]));
+			deallocate(t[0], strlen(t[0]) + 1 );	
 		}
 
 #ifdef PATCHED
