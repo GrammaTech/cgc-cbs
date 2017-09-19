@@ -1,0 +1,13 @@
+Source: libcgc
+Section: devel
+Priority: standard
+Maintainer: Brian Caswell <bmc@lungetech.com>
+Build-Depends: debhelper (>= 8.0.0), binutils-cgc-i386
+Standards-Version: 3.9.3
+Homepage: http://www.darpa.mil/cybergrandchallenge/
+
+Package: libcgc
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: CGC OS syscall library
+ libcgc provides the library that communicates with CGCOS execution enviornment.
