@@ -163,7 +163,8 @@ void handle(const int connection, const uid_t uid, const gid_t gid, const unsign
             wait_pairwise(pause_sockets_2);
 
             close_saved_sockets(saved_sockets);
-            set_cb_resources(wrapper);
+            if(insecure_flag == 0)
+                set_cb_resources(wrapper);
             start_program(timeout, programs[i], wrapper, env, seed, skiprng, max_transmit, max_receive);
             break;
         } else {

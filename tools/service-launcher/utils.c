@@ -53,14 +53,14 @@ void print_hash(const unsigned char *hash, const size_t hash_len) {
 }
 
 void print_source_identifier(const unsigned char *identifier, const size_t identifer_len) {
-    unsigned long id;
+    unsigned int id;
 
     if (identifer_len != sizeof(id))
         err(-1, "incorrect source identifier size.  Expected %d, got %d", sizeof(id), identifer_len);
 
-    id = (unsigned long) &identifier;
+    id = (unsigned int) &identifier;
 
-    printf("source identifier: %lu\n", id);
+    printf("source identifier: %d\n", id);
 }
 
 void print_filesizes(const int program_count, char **programs) {

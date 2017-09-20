@@ -318,8 +318,9 @@ class Runner(object):
         if not isinstance(self.port, int) or self.port == 0:
             self.port = self.random_port()
 
-        resource.setrlimit(resource.RLIMIT_CORE, (resource.RLIM_INFINITY,
-                                                  resource.RLIM_INFINITY))
+        # GT mod: set core to 0 for testing
+        #resource.setrlimit(resource.RLIMIT_CORE, (resource.RLIM_INFINITY,
+        #                                          resource.RLIM_INFINITY))
 
     def remote_cmd(self, node, cmd):
         """ Run the command on a remote host via ssh
@@ -507,13 +508,14 @@ class Runner(object):
         Raises:
             None
         """
-        for cb_name in self.cb_list:
-            cb_path = os.path.join(self.directory, cb_name)
-            try:
-                subprocess.check_output(['cgcef_verify', cb_path])
-            except subprocess.CalledProcessError as err:
-                logging.error('not ok - CB did not verify: %s', str(err), extra={'raw':True})
-                return -1
+        # GT mod: don't check for CGC header
+        #for cb_name in self.cb_list:
+        #    cb_path = os.path.join(self.directory, cb_name)
+        #    try:
+        #        subprocess.check_output(['cgcef_verify', cb_path])
+        #    except subprocess.CalledProcessError as err:
+        #        logging.error('not ok - CB did not verify: %s', str(err), extra={'raw':True})
+        #        return -1
         return 0
 
     @staticmethod
@@ -598,8 +600,9 @@ class Runner(object):
         """
         assert connection_count > 0
 
+        # GT mod: set core to 0 for testing
         server_cmd = ['cb-server', '--insecure', '-p', "%d" % self.port,
-                     '-m', "%d" % connection_count]
+                     '-m', "%d" % connection_count, '-c', '0']
 
         if self._remote:
             cb_paths = [os.path.join(self.directory, x) for x in self.cb_list]
@@ -618,7 +621,7 @@ class Runner(object):
 
         if self.cb_seed is not None and self.negotiate_seed is None:
             server_cmd += ['-s', self.cb_seed]
-        
+
         if self.cb_seed_skip is not None:
             server_cmd += ['-S', '%d' % self.cb_seed_skip]
 
@@ -627,7 +630,7 @@ class Runner(object):
 
         if self.timeout > 0:
             server_cmd += ['-t', '%d' % self.timeout]
-            
+
         if self.max_send is not None and self.max_send > 0:
             server_cmd += ['-M', '%d' % self.max_send]
 
@@ -682,7 +685,7 @@ class Runner(object):
 
             if self.should_debug:
                 proxy_cmd += ['--debug']
-        
+
             if self.negotiate_seed:
                 proxy_cmd += ['--negotiate']
 
@@ -756,10 +759,10 @@ class Runner(object):
         if replay_bin == 'cb-replay':
             if self.failure_ok:
                 replay_cmd += ['--failure_ok']
-    
+
             if self.concurrent:
                 replay_cmd += ['--concurrent', '%d' % self.concurrent]
-           
+
         if self.max_send is not None and self.max_send > 0:
             replay_cmd += ['--max_send', '%d' % self.max_send]
 
@@ -825,7 +828,7 @@ class Runner(object):
             if self.should_core:
                 logging.error('not ok - POV type 1 should have cored, and did not.', extra={'raw':True})
                 return -1
-            else:            
+            else:
                 logging.warning('ok - POV type 1 did not core, as expected', extra={'raw':True})
                 return 0
         elif not self.should_core:
@@ -838,7 +841,7 @@ class Runner(object):
             return -1
         ip_mask = int(match.group(1), 16)
         reg_mask = int(match.group(2), 16)
-            
+
         match = re.match(r"(?ms).*\n# type 1 pov: ([a-fA-F0-9]+) ([a-fA-F0-9]+) (\d)", replay_stdout)
         if not match:
             logging.error('not ok - POV type 1 negotiation failed', extra={'raw':True})
@@ -847,7 +850,7 @@ class Runner(object):
         ip_value = int(match.group(1), 16)
         reg_value = int(match.group(2), 16)
         reg_num = int(match.group(3))
-        
+
         logging.warning('POV type 1 negotiated masks: %08x %08x %d', ip_mask, reg_mask, reg_num)
         # logging.warning('process cored as expected (signal %d: %s)', sig, self.signal_name(sig))
 
@@ -886,7 +889,7 @@ class Runner(object):
 
         for values in results:
             logging.error('not ok - TYPE 1 POV FAILED.  expected eip: %08x actual eip: %08x expected reg: %08x actual reg: %08x', expected_eip, values[0], expected_reg, values[1], extra={'raw': True})
-        
+
         return -1
 
     def _check_result_type2(self, replay_stdout, server_stdout):
@@ -898,7 +901,7 @@ class Runner(object):
                 return -1
 
             seed = match.group(1)
-        
+
         prng = ansi_x931_aes128.PRNG(seed.decode('hex'))
         flag_page = prng.get(0x1000)
 
@@ -1009,16 +1012,17 @@ class Runner(object):
             server = self.start_server(len(xml_list))
             ids = self.start_ids(len(xml_list))
             replay_result = self.start_replay(xml_list)
-            
+
             if server.process.poll() is None:
                 self.use_server_connections(len(xml_list))
 
             server_result = None, ''
 
-            # wait a maximum of 30 seconds after our replay and socket cleanup
+            # GT mod: allow 90 seconds for running under ARM emulator
+            # wait a maximum of 90 seconds after our replay and socket cleanup
             # finishes before terminating cb-server if it hasn't returned yet.
             try:
-                with Timeout(30):
+                with Timeout(90):
                     server_result = server.wait()
             except TimeoutException:
                 server.terminate()
@@ -1148,7 +1152,7 @@ def main():
 
     if args.cb_seed is not None:
         assert len(args.cb_seed) == 96, "--cb_seed must be 96 bytes"
-    
+
     if args.pov_seed is not None:
         assert len(args.pov_seed) == 96, "--pov_seed must be 96 bytes"
 
@@ -1178,7 +1182,7 @@ def main():
                     args.directory, args.should_core, args.failure_ok,
                     args.debug, args.timeout, log_fh, args.cb_seed,
                     args.cb_seed_skip, args.max_send, args.concurrent,
-                    args.negotiate_seed, args.pov_seed, args.cb_no_attach, 
+                    args.negotiate_seed, args.pov_seed, args.cb_no_attach,
                     args.cb_seed_munge, args.cb_env)
 
     if args.ids_rules:
