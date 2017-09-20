@@ -6,7 +6,8 @@ PATH=/usr/i386-linux-cgc/bin:/bin:/usr/bin
 
 .SUFFIXES: .md .2.gz
 
-ASFLAGS=
+ASFLAGS         = --32
+CFLAGS     	= -O0 -g -c -m32 -Wall -nostdlib -static -fno-asynchronous-unwind-tables
 
 %.2.gz: %.md
 	pandoc -s -t man $< | gzip -9 > $@
@@ -18,8 +19,14 @@ all: libcgc.a \
 libcgc.a: libcgc.o maths.o
 	$(AR) cruv $@ libcgc.o maths.o
 
-libcgc.o: libcgc.s
-	$(AS) -o $@ $< $(ASFLAGS)
+# libcgc.o: libcgc.s
+# 	$(AS) -o $@ $< $(ASFLAGS)
+
+libcgc.o: libcgc.c
+	$(CC) -o $@ $< $(CFLAGS)
+
+libcgc-lep.o: libcgc.c
+	$(CC) -o $@ $< $(CFLAGS) -DLEP
 
 maths.o: maths.s
 	$(AS) -o $@ $< $(ASFLAGS)
@@ -40,4 +47,4 @@ install: libcgc.a
 	install -m 444 transmit.2.gz $(MANDIR)
 
 clean:
-	rm -f libcgc.[oa] *.2.gz maths.o
+	rm -f libcgc.[oa] *.2.gz
