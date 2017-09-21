@@ -1,0 +1,79 @@
+#!/bin/bash
+#
+# Usage: asm-diff [options] file1 file2 [-- diff options]
+#  Return the difference in the objudmp parsing of files
+#
+# OPTIONS:
+#   -o,--objdump CMD --- specify objdump command to use
+#   -j,--section NAME -- section to compare
+#                        (default: .text)
+#   -c,--clean --------- specify whether to clean addresses
+#   -C,--really-clean -- specify whether to REALLY clean addresses
+#   -O,--objargs ARGS -- specify objdump args to use
+#                        (default --no-show-raw-insn -d)
+#                        (for data try -s)
+#   -u,--context NUM --- NUM lines of context
+#                        (default: 2000)
+#   -d,--diffargs ARGS - specify diff args. Overrides context.
+#                        (default: -uN)
+#                        e.g., "-d '-y'" for side-by-side diff
+. $(dirname $0)/common
+
+OBJDUMP=objdump
+OBJDUMP_ARGS="--no-show-raw-insn -d"
+SECTION=.text
+CLEAN=
+CONTEXT=4
+DIFF_ARGS="-uN"
+
+eval set -- $(getopt -o ho:j:cCO:u:d: -l help,objdump:,section:,clean,really-clean,objargs:,context:,diffargs: -- "$@" || help;)
+while [ $# -gt 0 ];do
+    case $1 in
+        -h|--help) help;;
+        -o|--objdump) OBJDUMP=$2; shift;;
+        -O|--objargs) OBJDUMP_ARGS=$2; shift;;
+        -j|--section) SECTION=$2; shift;;
+        -c|--clean) CLEAN=yes;;
+        -C|--really-clean) CLEAN=REALLY;;
+        -u|--context) CONTEXT=$2; shift;;
+        -d|--diffargs) DIFF_ARGS=$2; CONTEXT=""; shift;;
+        (--) shift; break;;
+        (-*) error "unrecognized option $1";;
+        (*)  break;;
+    esac
+    shift
+done
+if [ -z $1 ] || [ ! -f $1 ] || [ -z $2 ] || [ ! -f $2 ] ;then
+    help
+else
+    LEFT=/tmp/asmdiff.left
+    RIGHT=/tmp/asmdiff.right
+    cp $1 $LEFT
+    cp $2 $RIGHT
+
+    strip $LEFT -w --strip-symbol="__ltrand.*"
+    strip $RIGHT -w --strip-symbol="__ltrand.*"
+    shift; shift;
+fi
+
+clean(){
+    if [ -z $CLEAN ];then
+        cat -
+    elif [ $CLEAN == REALLY ];then
+        cat -|sed 's/[0-9a-f]\+\([: ]\)/ADDR\1/;' \
+             |sed 's/\(callq\|jmp\|jmpq\|jne\|je\|js\)\( *\)[0-9a-f]\+/\1\2ADDR/' \
+             |sed 's/[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]/ADDR/;'
+    else
+        cat -|sed 's/[0-9a-f]\+\([: ]\)/ADDR\1/;' \
+             |sed 's/\(callq\|jmp\|jmpq\|jne\|je\|js\)\( *\)[0-9a-f]\+/\1\2ADDR/'
+    fi
+}
+
+if [ ! -z $CONTEXT ];then
+    CONTEXT="-U$CONTEXT"
+fi
+
+colordiff $DIFF_ARGS $CONTEXT \
+    <($OBJDUMP $OBJDUMP_ARGS -j $SECTION $LEFT|clean) \
+    <($OBJDUMP $OBJDUMP_ARGS -j $SECTION $RIGHT|clean) |tail -n+5
+rm -f $LEFT $RIGHT

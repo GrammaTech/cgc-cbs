@@ -1,0 +1,9 @@
+#!/bin/bash
+#
+# Call xml-to-file with required environment.
+#
+#     xml-to-file -x <xml> -o <outfile>
+#
+env PATH=$PATH:$(dirname $0)/../arxs/cgc-scripts	\
+    PYTHONPATH=$(dirname $0)/../arxs/cgc-scripts	\
+    $(dirname $0)/../arxs/cgc-scripts/xml_to_file.py $@

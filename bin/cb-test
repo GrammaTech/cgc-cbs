@@ -1,0 +1,11 @@
+#!/bin/bash
+#
+# Call cb-test, with required environment.
+#
+# E.g., cb-test --cb atds/CROMU_00008.cgc-sieve \
+#               --xml_dir cgc-samples/cqe-challenges/CROMU_00008/poller/for-testing \
+#               --directory .
+#
+env PATH=$PATH:$(dirname $0)/../tools/service-launcher:$(dirname $0)/../tools/cb-testing	\
+    PYTHONPATH=$(dirname $0)/../tools/cb-testing/lib					\
+    $(dirname $0)/../tools/cb-testing/cb-test $@

@@ -1,0 +1,5 @@
+# poller inputs
+**/for-release/*.xml
+**/for-release/graph.dot
+**/for-testing/*.xml
+**/for-testing/graph.dot
