@@ -25,9 +25,9 @@ The layout of the repository is as follows:
 
 ## Setup
 
-The test tools requires that some Python packages be installed:
+The test tools require that some Python packages be installed:
 
-        sudo pip install matplotlib
+        sudo pip install pycrypto pyyaml matplotlib defusedxml
 
 And the service launcher must be built:
 
