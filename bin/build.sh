@@ -2,6 +2,11 @@
 SCRIPTPATH=$(dirname $(readlink -f "$0"))
 LIBCGC="$SCRIPTPATH/../lib/libcgc"
 
+if [ ! -d src ]; then
+    echo "Multi-process CBs not supported..." >&2
+    exit 1
+fi
+
 if [ $# -lt 2 ]; then
     echo "Usage: $0 target cc ..." >&2
     exit 1
