@@ -1,4 +1,4 @@
-CC = gcc
+CC ?= gcc
 
 EXCLUDE = examples/CROMU_00063/ \
 	examples/CROMU_00070/ \
@@ -36,13 +36,21 @@ EXCLUDE = examples/CROMU_00063/ \
 ALL_DIRS = $(dir $(wildcard examples/*/. cqe-challenges/*/.))
 CHALLENGE_DIRS = $(filter-out $(EXCLUDE),$(ALL_DIRS))
 CHALLENGES = $(foreach d,$(CHALLENGE_DIRS),$(d)$(lastword $(subst /, ,$(d))))
+POLLERS = $(foreach d,$(CHALLENGE_DIRS),$(d)pollers)
 TEST_LOGS = $(foreach d,$(CHALLENGE_DIRS),$(d)test.log)
 
-all: $(CHALLENGES)
+all: $(CHALLENGES) $(POLLERS)
 
 $(CHALLENGES):
 	@echo $@
-	@cd $(dir $@) && build.sh $(notdir $@) $(CC) > /dev/null
+	@cd $(dir $@) && build.sh $(notdir $@) $(CC) $(CFLAGS)
+
+%/pollers:
+	@cd $*/poller/for-release && generate-polls machine.py state-graph.yaml .
+
+%/test.log: %/$(lastword $(subst /, ,%))
+	@echo $<
+	cb-test --directory $* --cb $(lastword $(subst /, ,$*)) --xml_dir $*/poller/for-release --log $@
 
 clean:
 	rm -f $(CHALLENGES)
