@@ -41,6 +41,8 @@ TEST_LOGS = $(foreach d,$(CHALLENGE_DIRS),$(d)test.log)
 
 all: $(CHALLENGES) $(POLLERS)
 
+check: $(TEST_LOGS)
+
 $(CHALLENGES):
 	@echo $@
 	@cd $(dir $@) && build.sh $(notdir $@) $(CC) $(CFLAGS)
@@ -48,9 +50,10 @@ $(CHALLENGES):
 %/pollers:
 	@cd $*/poller/for-release && generate-polls machine.py state-graph.yaml .
 
-%/test.log: %/$(lastword $(subst /, ,%))
-	@echo $<
-	cb-test --directory $* --cb $(lastword $(subst /, ,$*)) --xml_dir $*/poller/for-release --log $@
+%/test.log:
+	-@cb-test --directory $* --cb $(lastword $(subst /, ,$*)) --xml_dir $*/poller/for-release --log $@ --debug
+	@grep "polls " $@
 
 clean:
-	rm -f $(CHALLENGES)
+	@rm -vf $(CHALLENGES)
+	@rm -vf $(TEST_LOGS)
