@@ -16,7 +16,7 @@ along with GrammaTech modifications to provide compatibility across ISAs
 The repository is laid out as follows:
 
 | Path              | Contents                                                        |
-|-------------------+-----------------------------------------------------------------|
+|-------------------|-----------------------------------------------------------------|
 | `bin/`            | Utility scripts useful for building and running tests           |
 | `cqe-challenges/` | CBs from the CGC qualifying event                               |
 | `debian/`         | Debian packaging folder (unchanged from DARPA)                  |
