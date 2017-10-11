@@ -38,9 +38,10 @@ CHALLENGE_DIRS = $(filter-out $(EXCLUDE),$(ALL_DIRS))
 CHALLENGES = $(foreach d,$(CHALLENGE_DIRS),$(d)$(lastword $(subst /, ,$(d))))
 POLLERS = $(foreach d,$(CHALLENGE_DIRS),$(d)pollers)
 TEST_LOGS = $(foreach d,$(CHALLENGE_DIRS),$(d)test.log)
+OBJS = $(foreach d,$(CHALLENGE_DIRS),$(d)obj)
 
 all: $(CHALLENGES) $(POLLERS)
-
+challenges: $(CHALLENGES)
 check: $(TEST_LOGS)
 
 $(CHALLENGES):
@@ -57,3 +58,4 @@ $(CHALLENGES):
 clean:
 	@rm -vf $(CHALLENGES)
 	@rm -vf $(TEST_LOGS)
+	@rm -rvf $(OBJS)
