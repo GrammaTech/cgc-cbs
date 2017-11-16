@@ -43,9 +43,10 @@ done
 ${CC_CFLAGS} ${DMACRO} -c -o obj/libcgc.o "$LIBCGC/libcgc.c"
 ${CC_CFLAGS} ${DMACRO} -c -o obj/libcgc_lo.o "$LIBCGC/libcgc_lo.S"
 
-case "$1" in
-    arm*|*/arm*) cp $LIBCGC/padding.o obj ;;
-    #NOTYET *) ${CC_CFLAGS} -c -o obj/maths.o "$LIBCGC/maths.s" ;;
-esac
+# NOTE: Padding is no longer needed for ARM CGC tests.
+#case "$1" in
+#    arm*|*/arm*) cp $LIBCGC/padding.o obj ;;
+#    #NOTYET *) ${CC_CFLAGS} -c -o obj/maths.o "$LIBCGC/maths.s" ;;
+#esac
 
 ${CC_CFLAGS} -nostartfiles -o "$TARGET" obj/*.o -lm $LIBSTDCPP
