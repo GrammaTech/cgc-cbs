@@ -254,6 +254,7 @@ void print_registers(pid_t pid) {
     res = ptrace(PT_GETREGS, pid, 0, (caddr_t)&registers);
     if (res == 0) {
         printf("register states - ");
+#ifdef __i386__
         printf("eax: %08lx ", registers.eax);
         printf("ecx: %08lx ", registers.ecx);
         printf("edx: %08lx ", registers.edx);
@@ -263,6 +264,19 @@ void print_registers(pid_t pid) {
         printf("esi: %08lx ", registers.esi);
         printf("edi: %08lx ", registers.edi);
         printf("eip: %08lx\n", registers.eip);
+#elif defined(__x86_64__)
+        printf("rax: %08llx ", registers.rax);
+        printf("rcx: %08llx ", registers.rcx);
+        printf("rdx: %08llx ", registers.rdx);
+        printf("rbx: %08llx ", registers.rbx);
+        printf("rsp: %08llx ", registers.rsp);
+        printf("rbp: %08llx ", registers.rbp);
+        printf("rsi: %08llx ", registers.rsi);
+        printf("rdi: %08llx ", registers.rdi);
+        printf("rip: %08llx\n", registers.rip);
+#else
+#error "your turn..."
+#endif
         fflush(stdout);
     }
 }
