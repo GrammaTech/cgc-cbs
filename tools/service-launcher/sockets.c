@@ -230,7 +230,7 @@ uint32_t read_uint32_t(int fd) {
 
     read = read_size(fd, (char *) &value, sizeof(value));
     if (read != sizeof(value))
-        err(-1, "read uint32_t failed: Expected %u bytes, got %zu bytes", sizeof(value), read);
+        err(-1, "read uint32_t failed: Expected %zu bytes, got %zu bytes", sizeof(value), read);
 
     return value;
 }
@@ -241,11 +241,11 @@ unsigned char * read_buffer(const int fd, const size_t size) {
 
     buf = malloc(size);
     if (!buf)
-        err(-1, "unable to allocate %u bytes\n", size);
+        err(-1, "unable to allocate %zu bytes\n", size);
 
     read = read_size(fd, (void *) buf, size);
     if (read != size)
-        err(-1, "read buffer failed: Expected %u bytes, got %zu bytes", size, read);
+        err(-1, "read buffer failed: Expected %zu bytes, got %zu bytes", size, read);
 
     return buf;
 }

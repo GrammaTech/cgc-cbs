@@ -43,7 +43,7 @@ void print_hash(const unsigned char *hash, const size_t hash_len) {
     int i;
 
     if (hash_len != HASH_LEN_EXPECTED)
-        err(-1, "incorrect hash size.  Expected %d, got %d", HASH_LEN_EXPECTED, hash_len);
+        err(-1, "incorrect hash size.  Expected %d, got %zu", HASH_LEN_EXPECTED, hash_len);
     
     for (i = 0; i < HASH_LEN_EXPECTED; i++) {
         snprintf(hash_hex + (2 * i), 3, "%02X", hash[i]);
@@ -53,14 +53,14 @@ void print_hash(const unsigned char *hash, const size_t hash_len) {
 }
 
 void print_source_identifier(const unsigned char *identifier, const size_t identifer_len) {
-    unsigned int id;
+    unsigned long id;
 
     if (identifer_len != sizeof(id))
-        err(-1, "incorrect source identifier size.  Expected %d, got %d", sizeof(id), identifer_len);
+        err(-1, "incorrect source identifier size.  Expected %zu, got %zu", sizeof(id), identifer_len);
 
-    id = (unsigned int) &identifier;
+    id = (unsigned long) &identifier;
 
-    printf("source identifier: %d\n", id);
+    printf("source identifier: %lu\n", id);
 }
 
 void print_filesizes(const int program_count, char **programs) {
@@ -118,7 +118,7 @@ char * set_prng_seed(const unsigned char *buf, const size_t size) {
     int i;
 
     if (size != SEED_SIZE)
-        err(-1, "invalid seed size: %d", size);
+        err(-1, "invalid seed size: %zu", size);
 
     for (i = 0; i < SEED_SIZE; i++) {
         snprintf(seed_hex + (2 * i), 3, "%02X", buf[i]);
