@@ -10,11 +10,11 @@ LD      	    = gcc
 CFLAGS += -O3 -g -D_FORTIFY_SOURCE=2 -fstack-protector -fPIE
 CFLAGS += -Werror -Wno-variadic-macros 
 CFLAGS += -DRANDOM_UID -DHAVE_SETRESGID
-CFLAGS += -m32
+CFLAGS += 
 # CFLAGS += -fsanitize=undefined-trap -fsanitize-undefined-trap-on-error -Wno-disabled-macro-expansion
 
-LDFLAGS += -Wl,-z,relro -Wl,-z,now
-LDFLAGS += -m32
+#LDFLAGS += -Wl,-z,relro -Wl,-z,now
+#LDFLAGS += -m32
 
 all: $(BINARY) man
 
