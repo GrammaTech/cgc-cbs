@@ -55,7 +55,17 @@ And you must build the service launcher (used by `cb-test` to feed inputs into C
   difficulties in analyzing it.
 
 - CGC challenge binaries can be tested for correctness with input/output pairs
-  called "pollers". Generate these poller inputs by using the `generate-polls`
+  called "pollers". Pre-built pollers are archived at
+  `/u4/TARBALLS/rewriting/cgc-cbs_poller_inputs.tar.xz`. Unpack these from the
+  root of the repo to extract `xml.tgz` archives in each challenge's 
+  `poller/for-testing` and/or `poller/for-release` directory(ies):
+
+        cd cgc-cbs
+        tar xf /u4/TARBALLS/rewriting/cgc-cbs_poller_inputs.tar.xz --strip-components=1
+        cd cqe-challenges/CROMU_00003/poller/for-release
+        tar xf xml.tgz
+  
+  You can also generate these poller inputs by using the `generate-polls`
   tool. Each challenge is accompanied by a state machine and state graph
   that the tool uses to generate poller inputs. Often there are two sets of
   these specifications, in `poller/for-testing` and `poller/for-release`. The
