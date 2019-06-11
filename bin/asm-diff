@@ -9,24 +9,42 @@
 #                        (default: .text)
 #   -c,--clean --------- specify whether to clean addresses
 #   -C,--really-clean -- specify whether to REALLY clean addresses
+#   -f,--fun-clean ----- clean function names
 #   -O,--objargs ARGS -- specify objdump args to use
 #                        (default --no-show-raw-insn -d)
 #                        (for data try -s)
+#   -s,--strip --------- strip before comparison
+#   -r,--ltrand-strip -- strip lt-rand symbols before comparison
 #   -u,--context NUM --- NUM lines of context
 #                        (default: 2000)
 #   -d,--diffargs ARGS - specify diff args. Overrides context.
 #                        (default: -uN)
 #                        e.g., "-d '-y'" for side-by-side diff
-. $(dirname $0)/common
+SCRIPT="$0"
+help(){
+    local HELP_TEXT=$(cat "$SCRIPT" \
+        |sed '/^[^#]/q' \
+        |head -n -1 \
+        |tail -n +3 \
+        |sed -e :a -e '/^\n*$/{$d;N;ba' -e '}' \
+        |cut -c3-)
+    echo "$HELP_TEXT"
+    exit 1
+}
 
 OBJDUMP=objdump
 OBJDUMP_ARGS="--no-show-raw-insn -d"
 SECTION=.text
 CLEAN=
+FN_CLEAN=
+STRIP=
+LTRAND_STRIP=
+LEFT_STRIP=
+RIGHT_STRIP=
 CONTEXT=4
 DIFF_ARGS="-uN"
 
-eval set -- $(getopt -o ho:j:cCO:u:d: -l help,objdump:,section:,clean,really-clean,objargs:,context:,diffargs: -- "$@" || help;)
+eval set -- $(getopt -o ho:j:cCfO:sru:d: -l help,objdump:,section:,clean,really-clean,fun-clean,objargs:,strip,ltrand-strip,context:,diffargs: -- "$@" || help;)
 while [ $# -gt 0 ];do
     case $1 in
         -h|--help) help;;
@@ -35,38 +53,70 @@ while [ $# -gt 0 ];do
         -j|--section) SECTION=$2; shift;;
         -c|--clean) CLEAN=yes;;
         -C|--really-clean) CLEAN=REALLY;;
+        -f|--fun-clean) FN_CLEAN=yes;;
         -u|--context) CONTEXT=$2; shift;;
         -d|--diffargs) DIFF_ARGS=$2; CONTEXT=""; shift;;
+        -s|--strip) STRIP=yes;;
+        -r|--ltrand-strip) LTRAND_STRIP=yes;;
         (--) shift; break;;
         (-*) error "unrecognized option $1";;
         (*)  break;;
     esac
     shift
 done
-if [ -z $1 ] || [ ! -f $1 ] || [ -z $2 ] || [ ! -f $2 ] ;then
+if [ -z $1 ] || [ ! -f $1 ] || [ -z $2 ] || [ ! -f $2 ];then
     help
 else
-    LEFT=/tmp/asmdiff.left
-    RIGHT=/tmp/asmdiff.right
-    cp $1 $LEFT
-    cp $2 $RIGHT
+    LEFT=$1
+    RIGHT=$2
+    shift;shift;
+fi
+if [ ! -z $1 ];then
+    DIFF_ARGS=$@
+    CONTEXT=""
+fi
 
-    strip $LEFT -w --strip-symbol="__ltrand.*"
-    strip $RIGHT -w --strip-symbol="__ltrand.*"
-    shift; shift;
+function exit_hook (){
+    if [ -f $LEFT_STRIP ];then
+        rm -f $LEFT_STRIP;
+    fi
+    if [ -f $RIGHT_STRIP ];then
+        rm -f $RIGHT_STRIP;
+    fi
+}
+trap exit_hook SIGHUP SIGINT SIGTERM
+
+if [ ! -z $STRIP ] || [ ! -z $LTRAND_STRIP ];then
+    LEFT_STRIP=$(mktemp $(basename $LEFT)-XXXXXX.strip)
+    RIGHT_STRIP=$(mktemp $(basename $RIGHT)-XXXXXX.strip)
+    if [ ! -z $STRIP ];then
+        STRIP_ARGS=-s
+    fi
+    if [ ! -z $LTRAND_STRIP ];then
+        STRIP_ARGS=-w --strip-symbol="__ltrand.*"
+    fi
+    strip $LEFT $STRIP_ARGS -o $LEFT_STRIP
+    strip $RIGHT $STRIP_ARGS -o $RIGHT_STRIP
+    LEFT=$LEFT_STRIP
+    RIGHT=$RIGHT_STRIP
 fi
 
 clean(){
-    if [ -z $CLEAN ];then
-        cat -
-    elif [ $CLEAN == REALLY ];then
-        cat -|sed 's/[0-9a-f]\+\([: ]\)/ADDR\1/;' \
-             |sed 's/\(callq\|jmp\|jmpq\|jne\|je\|js\)\( *\)[0-9a-f]\+/\1\2ADDR/' \
-             |sed 's/[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]/ADDR/;'
-    else
-        cat -|sed 's/[0-9a-f]\+\([: ]\)/ADDR\1/;' \
-             |sed 's/\(callq\|jmp\|jmpq\|jne\|je\|js\)\( *\)[0-9a-f]\+/\1\2ADDR/'
+    local SED_CMD=''
+    if [ ! -z $CLEAN ] || [ ! -z $FN_CLEAN ];then
+        SED_CMD+='s/[0-9a-f]\+\([: ]\)/ADDR\1/;'
+        SED_CMD+='s/\(callq\|jmp\|jmpq\|jne\|je\|js\)\( *\)[0-9a-f]\+/\1\2ADDR/;'
     fi
+    if [ $CLEAN == REALLY ];then
+        SED_CMD+='s/[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]/ADDR/g;'
+        SED_CMD+='s/0x[0-9a-f][0-9a-f][0-9a-f][0-9a-f](%rip)/0xADDR(%rip)/;'
+        SED_CMD+='s/0x[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f](%rip)/0xADDR(%rip)/;'
+    fi
+    if [ ! -z $FN_CLEAN ];then
+        SED_CMD+='s/<[^>]*>/<FUNCTION>/g;s/[0-9a-f][0-9a-f]\+ <FUNCTION>/ADDR <FUNCTION>/;'
+    fi
+    SED_CMD+='s/ADDR:  */ADDR: /;s/  *ADDR:/ ADDR:/;'
+    cat -|sed "$SED_CMD"
 }
 
 if [ ! -z $CONTEXT ];then
@@ -76,4 +126,5 @@ fi
 colordiff $DIFF_ARGS $CONTEXT \
     <($OBJDUMP $OBJDUMP_ARGS -j $SECTION $LEFT|clean) \
     <($OBJDUMP $OBJDUMP_ARGS -j $SECTION $RIGHT|clean) |tail -n+5
-rm -f $LEFT $RIGHT
+
+exit_hook
