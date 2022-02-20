@@ -35,7 +35,7 @@
 #include <sys/user.h>
 #include <sys/types.h>
 #include <sys/ptrace.h>
-
+#include <stdlib.h>
 #include "utils.h"
 #include "signals.h"
 
